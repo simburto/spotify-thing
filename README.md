@@ -3,6 +3,8 @@
 # instruction
 - create spotify developer account create a new app
 - use any domain as a redirect link 
+- clone this repo
+- install all packages in ```requirements.txt```
 - make a .env file and put 
 ```
 API_KEY = 'your api key'
