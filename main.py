@@ -67,8 +67,8 @@ playlistid = PID()
 #user authorization
 scopes = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public'
 token = util.prompt_for_user_token(username, scopes, client_id, client_secret, redirect_uri)
-
-
+sp = spotipy.Spotify(auth=token)
+print(sp.current_user_playlists)
 while True:
     try: 
       tracks = filter(get_playlist_tracks(username, playlistid))
@@ -78,11 +78,10 @@ while True:
       fdate = str(abs(dateavg(date).astype(int)))
       descwrite = "Average playlist age: " + fdate + " days"
       print(descwrite)
-      sp = spotipy.Spotify(auth=token)
       sp.trace = False
       status = sp.playlist_change_details(playlistid, description=descwrite)
       print(status)
-      sleep(300)
+      sleep(3600)
     #refresh token
     except spotipy.SpotifyOauthError as e:
         sp = spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth(scope=scopes))
