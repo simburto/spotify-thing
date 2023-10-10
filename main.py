@@ -12,6 +12,8 @@ load_dotenv()
 client_id = os.getenv('API_KEY')
 client_secret = os.getenv('API_SECRET')
 redirect_uri = os.getenv('API_LINK')
+username = os.getenv('USERNAME')
+playlist_link = os.getenv('PLAYLIST_LINK')
 if len(client_id) != 0 and len(client_secret) != 0 and len(redirect_uri) != 0:
     print(".env values imported")
 else:
@@ -23,9 +25,7 @@ client_credentials_manager = oauth2.SpotifyClientCredentials(client_id=client_id
 sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 
 #filter out link to get playlist id
-def PID():
-  print("Playlist Link:", end = ' ')
-  playlist_link = input()
+def PID(playlist_link):
   playlist_URI = playlist_link.split("/")[-1].split("?")[0]
   return(playlist_URI)
 
@@ -59,18 +59,16 @@ def dateavg(date):
     difference = mean - current_date
     return(difference)
 
-#get username and playlist link
-print("Username:", end=' ')
-username = input()
-playlistid = PID()
-
 #user authorization
 scopes = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public'
 token = util.prompt_for_user_token(username, scopes, client_id, client_secret, redirect_uri)
 sp = spotipy.Spotify(auth=token)
 print(sp.current_user_playlists)
+
+#main loop
 while True:
     try: 
+      playlistid = PID(playlist_link)
       tracks = filter(get_playlist_tracks(username, playlistid))
       print(tracks)
       date = tracks[0]
@@ -80,8 +78,8 @@ while True:
       print(descwrite)
       sp.trace = False
       status = sp.playlist_change_details(playlistid, description=descwrite)
-      print(status)
       sleep(3600)
+      
     #refresh token
     except spotipy.SpotifyOauthError as e:
         sp = spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth(scope=scopes))
