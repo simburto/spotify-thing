@@ -2,3 +2,4 @@ spotipy==2.23.0
 numpy==1.26.0
 datetime==5.2
 dotenv==0.0.5
+tqdm==4.66.1

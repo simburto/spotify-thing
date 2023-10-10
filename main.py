@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import spotipy.util as util
 import numpy as np
 from time import sleep
+from tqdm import trange
 
 # load environment values
 load_dotenv()
@@ -36,6 +37,10 @@ def get_playlist_tracks(username, playlist_id):
     while results['next']:
       results = sp.next(results)
       tracks.extend(results['items'])
+    print("got playlist tracks")
+    if len(tracks) == 0:
+       print("import failed")
+       exit()
     return tracks
 
 #filter out tracks to acquire release date and name
@@ -44,9 +49,10 @@ def filter(tracks):
     date = ['balls' for x in range(len(tracks))]
     name = []
     name = ['balls' for x in range(len(tracks))]
-    for i in range(len(tracks)):
+    for i in trange(len(tracks), desc = "Filtering: "):
       date[i] = tracks[i]['track']['album']['release_date']
       name[i] = tracks[i]['track']['name']
+    print("tracks filtered")
     return (date, name)
 
 #average date
@@ -69,17 +75,18 @@ print(sp.current_user_playlists)
 while True:
     try: 
       playlistid = PID(playlist_link)
+      print(sp.playlist(playlistid))
       tracks = filter(get_playlist_tracks(username, playlistid))
-      print(tracks)
       date = tracks[0]
       name = tracks[1]
       fdate = str(abs(dateavg(date).astype(int)))
       years = str(round(int(fdate)/365, 2))
-      descwrite = "Average song age: " + fdate + " days (" + years + " years)"
+      descwrite = "Average song age: " + years + " years (" + fdate + " days)"
       print(descwrite)
       sp.trace = False
       status = sp.playlist_change_details(playlistid, description=descwrite)
-      sleep(3600)
+      for i in trange(3600):
+         sleep(1)
     #refresh token
     except spotipy.SpotifyOauthError as e:
         sp = spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth(scope=scopes))
