@@ -10,6 +10,8 @@
 API_KEY = 'your api key'
 API_SECRET = 'your api secret'
 API_LINK = 'your redirect link'
+USERNAME = 'your username'
+PLAYLIST_LINK = 'your playlist link'
 ```
 - MAKE SURE REDIRECT LINK IS EXACLTY THE SAME AS THE ONE IN SPOTIFY APP
 
