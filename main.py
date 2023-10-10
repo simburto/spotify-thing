@@ -14,7 +14,7 @@ client_secret = os.getenv('API_SECRET')
 redirect_uri = os.getenv('API_LINK')
 username = os.getenv('USERNAME')
 playlist_link = os.getenv('PLAYLIST_LINK')
-if len(client_id) != 0 and len(client_secret) != 0 and len(redirect_uri) != 0:
+if len(client_id) != 0 and len(client_secret) != 0 and len(redirect_uri) != 0 and len(playlist_link) != 0 and len(username) != 0:
     print(".env values imported")
 else:
     print(".env values failed to import")
@@ -79,7 +79,6 @@ while True:
       sp.trace = False
       status = sp.playlist_change_details(playlistid, description=descwrite)
       sleep(3600)
-      
     #refresh token
     except spotipy.SpotifyOauthError as e:
         sp = spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth(scope=scopes))
