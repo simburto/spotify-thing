@@ -74,7 +74,8 @@ while True:
       date = tracks[0]
       name = tracks[1]
       fdate = str(abs(dateavg(date).astype(int)))
-      descwrite = "Average playlist age: " + fdate + " days"
+      years = str(round(int(fdate)/365, 2))
+      descwrite = "Average song age: " + fdate + " days (" + years + " years)"
       print(descwrite)
       sp.trace = False
       status = sp.playlist_change_details(playlistid, description=descwrite)
