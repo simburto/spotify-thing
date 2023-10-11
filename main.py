@@ -1,3 +1,13 @@
+import subprocess
+import sys
+
+if open('cache.txt', 'r').read() != '1':
+  packages = open('requirements.txt', 'r').read().splitlines()
+  for i in range(len(packages)):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", packages[i]])
+  with open('cache.txt', 'w') as f:
+    f.write('1')
+  
 import spotipy
 import spotipy.oauth2 as oauth2
 import os
@@ -24,6 +34,11 @@ else:
 #authenticate dev key
 client_credentials_manager = oauth2.SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
+
+#user authorization
+scopes = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public ugc-image-upload'
+token = util.prompt_for_user_token(username, scopes, client_id, client_secret, redirect_uri)
+sp = spotipy.Spotify(auth=token)
 
 #filter out link to get playlist id
 def PID(playlist_link):
@@ -52,6 +67,7 @@ def filter(tracks):
     for i in trange(len(tracks), desc = "Filtering: "):
       date[i] = tracks[i]['track']['album']['release_date']
       name[i] = tracks[i]['track']['name']
+      sleep(0.001)
     print("tracks filtered")
     return (date, name)
 
@@ -65,28 +81,23 @@ def dateavg(date):
     difference = mean - current_date
     return(difference)
 
-#user authorization
-scopes = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public'
-token = util.prompt_for_user_token(username, scopes, client_id, client_secret, redirect_uri)
-sp = spotipy.Spotify(auth=token)
-print(sp.current_user_playlists)
-
 #main loop
 while True:
     try: 
-      playlistid = PID(playlist_link)
-      print(sp.playlist(playlistid))
-      tracks = filter(get_playlist_tracks(username, playlistid))
-      date = tracks[0]
-      name = tracks[1]
-      fdate = str(abs(dateavg(date).astype(int)))
-      years = str(round(int(fdate)/365, 2))
-      descwrite = "Average song age: " + years + " years (" + fdate + " days)"
-      print(descwrite)
-      sp.trace = False
-      status = sp.playlist_change_details(playlistid, description=descwrite)
-      for i in trange(3600):
-         sleep(1)
-    #refresh token
+        playlistid = PID(playlist_link)
+        tracks = filter(get_playlist_tracks(username, playlistid))
+        date = tracks[0]
+        name = tracks[1]
+        fdate = str(abs(dateavg(date).astype(int)))
+        years = str(round(int(fdate)/365, 2))
+        descwrite = "Average song age: " + years + " years (" + fdate + " days)"
+        print(descwrite)
+        sp.trace = False
+        status = sp.playlist_change_details(playlistid, description=descwrite)
+        i = 0
+        for i in trange(3600):
+          sleep(1)
     except spotipy.SpotifyOauthError as e:
-        sp = spotipy.Spotify(auth_manager=spotipy.SpotifyOAuth(scope=scopes))
+        # Refresh the access token
+        token = util.prompt_for_user_token(username, scopes, client_id, client_secret, redirect_uri)
+        sp = spotipy.Spotify(auth=token)
