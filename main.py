@@ -1,13 +1,25 @@
 import subprocess
 import sys
 
-if open('cache.txt', 'r').read() != '1':
+#check for packages
+try: 
+  if open('cache.txt', 'r').read() != '1':
+    packages = open('requirements.txt', 'r').read().splitlines()
+    print("installing dependencies")
+    for i in range(len(packages)):
+      subprocess.check_call([sys.executable, "-m", "pip", "install", packages[i]])
+    with open('cache.txt', 'w') as f:
+      f.write('1')
+except:
+  open('cache.txt', 'w')
+  print("created cache file")
+  print("installing dependencies")
   packages = open('requirements.txt', 'r').read().splitlines()
   for i in range(len(packages)):
     subprocess.check_call([sys.executable, "-m", "pip", "install", packages[i]])
   with open('cache.txt', 'w') as f:
     f.write('1')
-  
+
 import spotipy
 import spotipy.oauth2 as oauth2
 import os
