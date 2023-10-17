@@ -22,10 +22,10 @@ except:
 
 import spotipy
 import spotipy.oauth2 as oauth2
+import spotipy.util as util
 import os
 import datetime
 from dotenv import load_dotenv
-import spotipy.util as util
 import numpy as np
 from time import sleep
 from tqdm import trange
